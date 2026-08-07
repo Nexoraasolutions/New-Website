@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1200px;height:630px;background:#05070A;color:#EEF3F6;font-family:'Inter',sans-serif;overflow:hidden;position:relative}
+.grid{position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);
+  background-size:74px 74px;
+  -webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 0%,#000 5%,transparent 75%)}
+.orb{position:absolute;width:820px;height:820px;border-radius:50%;top:-380px;right:-220px;filter:blur(110px);
+  background:radial-gradient(circle,rgba(0,224,255,.34),transparent 66%)}
+.orb2{position:absolute;width:600px;height:600px;border-radius:50%;bottom:-360px;left:-180px;filter:blur(100px);
+  background:radial-gradient(circle,rgba(0,224,255,.16),transparent 66%)}
+.in{position:relative;padding:74px 80px;height:100%;display:flex;flex-direction:column;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:16px}
+.logo-img{height:54px;}
+.logo-wm{height:36px;}
+h1{font-family:'Sora',sans-serif;font-weight:600;font-size:82px;line-height:1.04;letter-spacing:-.038em}
+h1 em{font-style:normal;color:#00E0FF}
+p{font-size:25px;color:#8B98A5;margin-top:26px;max-width:24ch;line-height:1.5}
+.foot{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.chip{font-size:19px;padding:11px 22px;border-radius:99px;border:1px solid rgba(255,255,255,.14);color:#8B98A5}
+.chip.hi{border-color:rgba(0,224,255,.45);color:#EEF3F6;background:rgba(0,224,255,.09)}
+</style></head>
+<body>
+<div class="grid"></div><div class="orb"></div><div class="orb2"></div>
+<div class="in">
+  <div class="logo">
+    <img src="assets/logo-mark.svg" class="logo-img" alt="Nexoraa Icon" />
+    <img src="assets/logo-wordmark.svg" class="logo-wm" alt="Nexoraa Wordmark" />
+  </div>
+  <div>
+    <h1>Your home,<br>quietly <em>intelligent</em>.</h1>
+    <p>Luxury home automation, private cinemas, AI security and circadian lighting.</p>
+  </div>
+  <div class="foot">
+    <span class="chip hi">Guwahati &amp; the Northeast</span>
+    <span class="chip">Brand-neutral</span>
+    <span class="chip">Retrofit-friendly</span>
+    <span class="chip">Local team</span>
+  </div>
+</div>
+</body></html>
