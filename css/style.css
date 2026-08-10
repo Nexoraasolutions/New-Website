@@ -123,6 +123,20 @@ img {
   padding: 0 24px;
 }
 
+/* Responsive visibility utilities */
+.desktop-only-inline {
+  display: inline;
+}
+.mobile-only-inline {
+  display: none;
+}
+.desktop-cta-text {
+  display: inline;
+}
+.mobile-cta-text {
+  display: none;
+}
+
 .sec {
   padding: 110px 0;
   position: relative;
@@ -1556,6 +1570,20 @@ footer {
     height: 20px;
   }
 
+  /* Desktop / Mobile utility overrides for mobile screen widths */
+  .desktop-only-inline {
+    display: none !important;
+  }
+  .mobile-only-inline {
+    display: inline !important;
+  }
+  .desktop-cta-text {
+    display: none !important;
+  }
+  .mobile-cta-text {
+    display: inline !important;
+  }
+
   /* Hero Section Mobile Pass */
   .hero {
     padding-top: 115px;
@@ -1580,30 +1608,38 @@ footer {
     margin-bottom: 16px;
   }
 
+  /* Completely hide hero lead description on mobile without empty spacing */
   .hero-content .lead {
-    color: #D6E3EF;
-    font-size: clamp(0.95rem, 3.8vw, 1.1rem);
-    font-weight: 450;
-    line-height: 1.55;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-    margin-bottom: 24px;
+    display: none !important;
+    margin-bottom: 0 !important;
   }
 
   /* Hero CTAs Mobile Pass */
   .hero-cta {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     width: 100%;
-    margin-top: 24px;
+    margin-top: 20px;
   }
 
-  .hero-cta .btn-lg,
-  .hero-cta .btn {
-    padding: 12px 18px;
+  .hero-cta .hero-btn-p {
+    padding: 10px 18px;
     font-size: 0.92rem;
+    min-height: 44px;
     width: 100%;
     justify-content: center;
+    border-radius: var(--radius-full);
+  }
+
+  .hero-cta .hero-btn-g {
+    padding: 8px 16px;
+    font-size: 0.86rem;
+    min-height: 38px;
+    width: 100%;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    opacity: 0.9;
   }
 
   /* Smart Dashboard Card Mobile */
