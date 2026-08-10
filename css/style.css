@@ -1586,8 +1586,8 @@ footer {
 
   /* Hero Section Mobile Pass */
   .hero {
-    padding-top: 115px;
-    padding-bottom: 60px;
+    padding-top: 135px;
+    padding-bottom: 80px;
     min-height: auto;
   }
 
@@ -1602,10 +1602,22 @@ footer {
       rgba(5, 7, 10, 0.45) 100%);
   }
 
+  /* Spacious 85px vertical gap between Hero CTAs and Interactive Dashboard Card */
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 85px;
+  }
+
+  /* 44px spacing between location badge and headline */
+  .hero-content .pill {
+    margin-bottom: 44px;
+  }
+
+  /* 40px spacing between headline and primary CTA */
   .hero h1, .hero .h1 {
     font-size: clamp(2rem, 7.8vw, 2.5rem);
     line-height: 1.12;
-    margin-bottom: 16px;
+    margin-bottom: 40px;
   }
 
   /* Completely hide hero lead description on mobile without empty spacing */
@@ -1614,13 +1626,13 @@ footer {
     margin-bottom: 0 !important;
   }
 
-  /* Hero CTAs Mobile Pass */
+  /* Hero CTAs Mobile Pass: 16px gap between primary and secondary CTAs */
   .hero-cta {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 16px;
     width: 100%;
-    margin-top: 20px;
+    margin-top: 0;
   }
 
   .hero-cta .hero-btn-p {
