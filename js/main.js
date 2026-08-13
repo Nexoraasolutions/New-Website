@@ -58,191 +58,326 @@
 
   document.querySelectorAll('.reveal-up').forEach(function (el) {
     revealObserver.observe(el);
-  });
+  });  /* ---------- Global Ambient Background Pointer Light System ---------- */
+  function initAmbientBackgroundLight() {
+    // Mobile, touch, and reduced-motion checks
+    if (window.innerWidth <= 1024) return;
+    if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;
+    if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  /* ---------- INTERACTIVE HERO CONTROL DEMO & PARALLAX BACKDROP ---------- */
-  var heroBgImg = document.querySelector('.hero-bg-img');
+    var root = document.documentElement;
+    var targetX = 50;
+    var targetY = 50;
+    var currentX = 50;
+    var currentY = 50;
+    var isInitialized = false;
 
-  var lightSlider = document.getElementById('light-slider');
-  var lightVal = document.getElementById('light-val');
-  var lightSub = document.getElementById('light-sub');
+    function updatePointerLight() {
+      if (!isInitialized) return;
 
-  var blindSlider = document.getElementById('blind-slider');
-  var blindVal = document.getElementById('blind-val');
-  var blindSub = document.getElementById('blind-sub');
+      // Slight movement easing (lerp factor 0.22)
+      currentX += (targetX - currentX) * 0.22;
+      currentY += (targetY - currentY) * 0.22;
 
-  var tempVal = document.getElementById('temp-val');
-  var tempMinus = document.getElementById('temp-minus');
-  var tempPlus = document.getElementById('temp-plus');
-  var currentTemp = 22;
+      root.style.setProperty('--mouse-x', currentX.toFixed(2) + '%');
+      root.style.setProperty('--mouse-y', currentY.toFixed(2) + '%');
 
-  var lockBtn = document.getElementById('lock-btn');
-  var secBtn = document.getElementById('sec-btn');
-  var playBtn = document.getElementById('play-btn');
-  var audioSub = document.getElementById('audio-sub');
-  var isPlaying = false;
+      requestAnimationFrame(updatePointerLight);
+    }
 
-  var currentColorTemp = '2700K';
+    window.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch') return;
 
-  // Ambient Lighting Slider UI Demo
-  if (lightSlider) {
-    lightSlider.addEventListener('input', function () {
-      var val = this.value;
-      if (lightVal) lightVal.textContent = val + '%';
+      targetX = (e.clientX / window.innerWidth) * 100;
+      targetY = (e.clientY / window.innerHeight) * 100;
+
+      if (!isInitialized) {
+        currentX = targetX;
+        currentY = targetY;
+        isInitialized = true;
+        root.style.setProperty('--mouse-x', currentX.toFixed(2) + '%');
+        root.style.setProperty('--mouse-y', currentY.toFixed(2) + '%');
+        requestAnimationFrame(updatePointerLight);
+      }
+    }, { passive: true });
+  }
+
+  /* ---------- Upgraded Hero Smart-Home Control Card Engine ---------- */
+  function initHeroSmartCard() {
+    var lightSlider = document.getElementById('light-slider');
+    var lightVal = document.getElementById('light-val');
+    var lightSub = document.getElementById('light-sub');
+
+    var blindSlider = document.getElementById('blind-slider');
+    var blindVal = document.getElementById('blind-val');
+    var blindSub = document.getElementById('blind-sub');
+
+    var tempVal = document.getElementById('temp-val');
+    var tempMinus = document.getElementById('temp-minus');
+    var tempPlus = document.getElementById('temp-plus');
+
+    var lockBtn = document.getElementById('lock-btn');
+    var secBtn = document.getElementById('sec-btn');
+    var playBtn = document.getElementById('play-btn');
+    var audioSub = document.getElementById('audio-sub');
+
+    if (!lightSlider && !blindSlider) return;
+
+    // Current State Variables
+    var currentLight = parseInt(lightSlider ? lightSlider.value : 75, 10);
+    var currentBlind = parseInt(blindSlider ? blindSlider.value : 10, 10);
+    var currentTemp = 22;
+    var currentColorTemp = '2700K';
+    var isPlaying = false;
+    var activeAnimation = null;
+
+    // Scene Presets according to requirements
+    var SCENE_PRESETS = {
+      morning: {
+        light: 70,
+        k: '3000K',
+        blind: 80,
+        temp: 24,
+        lock: 'locked',
+        sec: 'home',
+        audio: 'standby',
+        audioText: 'Standby • Morning Playlist Ready'
+      },
+      night: {
+        light: 75,
+        k: '2700K',
+        blind: 10,
+        temp: 22,
+        lock: 'locked',
+        sec: 'active',
+        audio: 'standby',
+        audioText: 'Standby • Soft Evening Ambience'
+      },
+      cinema: {
+        light: 15,
+        k: '2700K',
+        blind: 0,
+        temp: 21,
+        lock: 'locked',
+        sec: 'active',
+        audio: 'playing',
+        audioText: 'Playing: B&O Cinema Surround'
+      },
+      away: {
+        light: 0,
+        k: '2700K',
+        blind: 0,
+        temp: 26,
+        lock: 'locked',
+        sec: 'away',
+        audio: 'off',
+        audioText: 'Audio Off • System Secured'
+      }
+    };
+
+    // Subsystem UI Updaters
+    function updateLightUI() {
+      if (lightVal) lightVal.textContent = Math.round(currentLight) + '%';
       if (lightSub) {
-        if (val == 0) lightSub.textContent = 'Lights Off • 0%';
-        else if (val <= 15) lightSub.textContent = 'Cinema Ambience • 15%';
-        else if (val <= 40) lightSub.textContent = 'Relaxed Evening • 40%';
-        else if (val <= 75) lightSub.textContent = 'Main Cove • ' + currentColorTemp;
+        if (currentLight === 0) lightSub.textContent = 'Lights Off • 0%';
+        else if (currentLight <= 20) lightSub.textContent = 'Cinema Ambience • ' + currentColorTemp;
+        else if (currentLight <= 50) lightSub.textContent = 'Relaxed Evening • ' + currentColorTemp;
+        else if (currentLight <= 80) lightSub.textContent = 'Main Cove • ' + currentColorTemp;
         else lightSub.textContent = 'Full Illumination • ' + currentColorTemp;
       }
-    });
-  }
+      if (lightSlider) lightSlider.value = Math.round(currentLight);
+    }
 
-  // Motorized Blinds Slider UI Demo
-  if (blindSlider) {
-    blindSlider.addEventListener('input', function () {
-      var val = this.value;
-      if (blindVal) blindVal.textContent = val + '%';
+    function updateBlindUI() {
+      if (blindVal) blindVal.textContent = Math.round(currentBlind) + '%';
       if (blindSub) {
-        if (val == 0) blindSub.textContent = 'Blackout Position';
-        else if (val == 50) blindSub.textContent = 'Half Open Privacy';
-        else if (val == 100) blindSub.textContent = 'Fully Open Daylight';
-        else if (val < 50) blindSub.textContent = 'Filter Privacy Shades';
-        else blindSub.textContent = 'Daylight Entry';
+        if (currentBlind === 0) blindSub.textContent = 'Blackout Position (Closed)';
+        else if (currentBlind >= 80) blindSub.textContent = 'Fully Open Daylight';
+        else if (currentBlind >= 40) blindSub.textContent = 'Half Open Privacy';
+        else blindSub.textContent = 'Filter Privacy Shades';
       }
-    });
-  }
+      if (blindSlider) blindSlider.value = Math.round(currentBlind);
+    }
 
-  // Color Temp Preset Buttons UI Demo
-  document.querySelectorAll('.k-btn').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      document.querySelectorAll('.k-btn').forEach(function (b) { b.classList.remove('active'); });
-      this.classList.add('active');
-      currentColorTemp = this.getAttribute('data-k');
-      if (lightSlider) lightSlider.dispatchEvent(new Event('input'));
-    });
-  });
+    function updateTempUI() {
+      if (tempVal) tempVal.textContent = Math.round(currentTemp) + '°C';
+    }
 
-  // Temperature Adjuster UI Demo
-  if (tempMinus) {
-    tempMinus.addEventListener('click', function () {
-      if (currentTemp > 16) {
-        currentTemp--;
-        if (tempVal) tempVal.textContent = currentTemp + '°C';
-      }
-    });
-  }
+    function updateKelvinButtons(k) {
+      currentColorTemp = k;
+      document.querySelectorAll('.k-btn').forEach(function (btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-k') === k);
+      });
+      updateLightUI();
+    }
 
-  if (tempPlus) {
-    tempPlus.addEventListener('click', function () {
-      if (currentTemp < 30) {
-        currentTemp++;
-        if (tempVal) tempVal.textContent = currentTemp + '°C';
-      }
-    });
-  }
-
-  // Smart Lock UI Demo
-  if (lockBtn) {
-    lockBtn.addEventListener('click', function () {
-      var isLocked = this.classList.contains('locked');
-      if (isLocked) {
-        this.classList.remove('locked');
-        this.classList.add('unlocked');
-        this.querySelector('.dash-lock-status').textContent = 'Unlocked';
+    function updateLockUI(state) {
+      if (!lockBtn) return;
+      var statusEl = lockBtn.querySelector('.dash-lock-status');
+      if (state === 'locked') {
+        lockBtn.className = 'dash-lock-btn locked';
+        if (statusEl) statusEl.textContent = 'Locked';
       } else {
-        this.classList.remove('unlocked');
-        this.classList.add('locked');
-        this.querySelector('.dash-lock-status').textContent = 'Locked';
+        lockBtn.className = 'dash-lock-btn unlocked';
+        if (statusEl) statusEl.textContent = 'Unlocked';
       }
-    });
-  }
+    }
 
-  // Security Status Toggle UI Demo
-  if (secBtn) {
-    secBtn.addEventListener('click', function () {
-      var isActive = this.classList.contains('active');
-      if (isActive) {
-        this.classList.remove('active');
-        this.classList.add('standby');
-        this.querySelector('.dash-sec-status').textContent = 'Standby';
+    function updateSecUI(state) {
+      if (!secBtn) return;
+      var statusEl = secBtn.querySelector('.dash-sec-status');
+      if (state === 'active' || state === 'away') {
+        secBtn.className = 'dash-sec-btn active';
+        if (statusEl) statusEl.textContent = state === 'away' ? 'Away/Active' : 'Active';
+      } else if (state === 'home') {
+        secBtn.className = 'dash-sec-btn active';
+        if (statusEl) statusEl.textContent = 'Home';
       } else {
-        this.classList.remove('standby');
+        secBtn.className = 'dash-sec-btn standby';
+        if (statusEl) statusEl.textContent = 'Standby';
+      }
+    }
+
+    function updateAudioUI(state, customText) {
+      if (!playBtn) return;
+      if (state === 'playing') {
+        isPlaying = true;
+        playBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+      } else {
+        isPlaying = false;
+        playBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+      }
+      if (audioSub) {
+        audioSub.textContent = customText || (isPlaying ? 'Playing: Bang & Olufsen Spatial Lounge' : 'Standby • Tap to Play');
+      }
+    }
+
+    // Smooth 600ms Transition Animator for Scene Selection
+    function animateToScene(preset) {
+      if (activeAnimation) cancelAnimationFrame(activeAnimation);
+
+      var startLight = currentLight;
+      var startBlind = currentBlind;
+      var startTemp = currentTemp;
+
+      var targetLight = preset.light;
+      var targetBlind = preset.blind;
+      var targetTemp = preset.temp;
+
+      var startTime = null;
+      var duration = 600; // 600ms transition duration
+
+      // Update discrete Kelvin, lock, security, audio immediately
+      updateKelvinButtons(preset.k);
+      updateLockUI(preset.lock);
+      updateSecUI(preset.sec);
+      updateAudioUI(preset.audio, preset.audioText);
+
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        var elapsed = timestamp - startTime;
+        var progress = Math.min(elapsed / duration, 1);
+
+        // Cubic easing out
+        var ease = 1 - Math.pow(1 - progress, 3);
+
+        currentLight = startLight + (targetLight - startLight) * ease;
+        currentBlind = startBlind + (targetBlind - startBlind) * ease;
+        currentTemp = startTemp + (targetTemp - startTemp) * ease;
+
+        updateLightUI();
+        updateBlindUI();
+        updateTempUI();
+
+        if (progress < 1) {
+          activeAnimation = requestAnimationFrame(step);
+        } else {
+          activeAnimation = null;
+        }
+      }
+
+      activeAnimation = requestAnimationFrame(step);
+    }
+
+    // Scene Buttons Event Listeners
+    document.querySelectorAll('.dash-scenes .scene-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.dash-scenes .scene-btn').forEach(function (b) { b.classList.remove('active'); });
         this.classList.add('active');
-        this.querySelector('.dash-sec-status').textContent = 'Active';
-      }
-    });
-  }
-
-  // Media Play/Pause UI Demo
-  if (playBtn) {
-    playBtn.addEventListener('click', function () {
-      isPlaying = !isPlaying;
-      if (isPlaying) {
-        this.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-        if (audioSub) audioSub.textContent = 'Playing: Bang & Olufsen Spatial Lounge';
-      } else {
-        this.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-        if (audioSub) audioSub.textContent = 'Paused • Tap to Play';
-      }
-    });
-  }
-
-  // Preset Scenes Handler UI Demo
-  document.querySelectorAll('.dash-scenes .scene-btn').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      document.querySelectorAll('.dash-scenes .scene-btn').forEach(function (b) { b.classList.remove('active'); });
-      this.classList.add('active');
-      var scene = this.getAttribute('data-scene');
-
-      if (scene === 'morning') {
-        currentColorTemp = '3000K';
-        document.querySelectorAll('.k-btn').forEach(function (b) {
-          b.classList.toggle('active', b.getAttribute('data-k') === '3000K');
-        });
-        if (lightSlider) lightSlider.value = 80;
-        if (blindSlider) blindSlider.value = 75;
-        currentTemp = 24;
-      } else if (scene === 'night') {
-        currentColorTemp = '2700K';
-        document.querySelectorAll('.k-btn').forEach(function (b) {
-          b.classList.toggle('active', b.getAttribute('data-k') === '2700K');
-        });
-        if (lightSlider) lightSlider.value = 70;
-        if (blindSlider) blindSlider.value = 20;
-        currentTemp = 22;
-      } else if (scene === 'cinema') {
-        currentColorTemp = '2700K';
-        document.querySelectorAll('.k-btn').forEach(function (b) {
-          b.classList.toggle('active', b.getAttribute('data-k') === '2700K');
-        });
-        if (lightSlider) lightSlider.value = 15;
-        if (blindSlider) blindSlider.value = 0;
-        currentTemp = 21;
-      } else if (scene === 'away') {
-        if (lightSlider) lightSlider.value = 0;
-        if (blindSlider) blindSlider.value = 0;
-        currentTemp = 26;
-        if (lockBtn) {
-          lockBtn.className = 'dash-lock-btn locked';
-          lockBtn.querySelector('.dash-lock-status').textContent = 'Locked';
+        var sceneName = this.getAttribute('data-scene');
+        if (SCENE_PRESETS[sceneName]) {
+          animateToScene(SCENE_PRESETS[sceneName]);
         }
-        if (secBtn) {
-          secBtn.className = 'dash-sec-btn active';
-          secBtn.querySelector('.dash-sec-status').textContent = 'Active';
-        }
-      }
-
-      if (tempVal) tempVal.textContent = currentTemp + '°C';
-      if (lightSlider) lightSlider.dispatchEvent(new Event('input'));
-      if (blindSlider) blindSlider.dispatchEvent(new Event('input'));
+      });
     });
-  });
+
+    // Manual Override Listeners
+    if (lightSlider) {
+      lightSlider.addEventListener('input', function () {
+        currentLight = parseInt(this.value, 10);
+        updateLightUI();
+      });
+    }
+
+    if (blindSlider) {
+      blindSlider.addEventListener('input', function () {
+        currentBlind = parseInt(this.value, 10);
+        updateBlindUI();
+      });
+    }
+
+    document.querySelectorAll('.k-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var k = this.getAttribute('data-k');
+        updateKelvinButtons(k);
+      });
+    });
+
+    if (tempMinus) {
+      tempMinus.addEventListener('click', function () {
+        if (currentTemp > 16) {
+          currentTemp = Math.round(currentTemp) - 1;
+          updateTempUI();
+        }
+      });
+    }
+
+    if (tempPlus) {
+      tempPlus.addEventListener('click', function () {
+        if (currentTemp < 30) {
+          currentTemp = Math.round(currentTemp) + 1;
+          updateTempUI();
+        }
+      });
+    }
+
+    if (lockBtn) {
+      lockBtn.addEventListener('click', function () {
+        var isCurrentlyLocked = this.classList.contains('locked');
+        updateLockUI(isCurrentlyLocked ? 'unlocked' : 'locked');
+      });
+    }
+
+    if (secBtn) {
+      secBtn.addEventListener('click', function () {
+        var isCurrentlyActive = this.classList.contains('active');
+        updateSecUI(isCurrentlyActive ? 'standby' : 'active');
+      });
+    }
+
+    if (playBtn) {
+      playBtn.addEventListener('click', function () {
+        updateAudioUI(isPlaying ? 'standby' : 'playing');
+      });
+    }
+  }
 
   // Parallax Mouse Depth effect on Dashboard UI Card & Hero Background Image
   var heroStage = document.querySelector('.hero-stage');
   var smartDash = document.querySelector('.smart-dashboard');
+  var heroBgImg = document.querySelector('.hero-bg-img');
+
   if (heroStage) {
     heroStage.addEventListener('mousemove', function (e) {
       var rect = heroStage.getBoundingClientRect();
@@ -262,7 +397,7 @@
         smartDash.style.transform = 'rotateY(0deg) rotateX(0deg) translateY(0px)';
       }
       if (heroBgImg) {
-        heroBgImg.style.transform = 'scale(1.02) translate(0px, 0px)';
+        heroBgImg.style.transform = 'scale(1) translate(0px, 0px)';
       }
     });
   }
@@ -330,128 +465,15 @@
     yrSpan.textContent = new Date().getFullYear();
   }
 
-  /* ---------- Ambient Cursor Luminance System ---------- */
-  function initAmbientCursor() {
-    // Mobile, touch, and reduced-motion checks
-    if (window.innerWidth <= 1024) return;
-    if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;
-    if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    if ('ontouchstart' in window && !window.matchMedia('(pointer: fine)').matches) return;
-
-    var glowEl = document.createElement('div');
-    glowEl.className = 'cursor-ambient-glow';
-    document.body.appendChild(glowEl);
-
-    var targetX = -100;
-    var targetY = -100;
-    var currentX = -100;
-    var currentY = -100;
-    var isInitialized = false;
-    var isHovering = false;
-    var clickTimeout = null;
-
-    function updatePosition() {
-      if (!isInitialized) return;
-
-      // Tight, responsive positioning following cursor precisely (lerp 0.45 = tight coupling, zero trailing/delayed animation)
-      currentX += (targetX - currentX) * 0.45;
-      currentY += (targetY - currentY) * 0.45;
-
-      if (Math.abs(targetX - currentX) < 0.05) currentX = targetX;
-      if (Math.abs(targetY - currentY) < 0.05) currentY = targetY;
-
-      glowEl.style.transform = 'translate3d(' + currentX.toFixed(1) + 'px, ' + currentY.toFixed(1) + 'px, 0)';
-
-      requestAnimationFrame(updatePosition);
-    }
-
-    window.addEventListener('pointermove', function (e) {
-      if (e.pointerType === 'touch') {
-        glowEl.classList.remove('is-visible');
-        return;
-      }
-
-      targetX = e.clientX;
-      targetY = e.clientY;
-
-      if (!isInitialized) {
-        currentX = targetX;
-        currentY = targetY;
-        isInitialized = true;
-        glowEl.classList.add('is-visible');
-        requestAnimationFrame(updatePosition);
-      } else {
-        glowEl.classList.add('is-visible');
-      }
-    }, { passive: true });
-
-    document.addEventListener('mouseleave', function () {
-      glowEl.classList.remove('is-visible');
-    });
-
-    document.addEventListener('mouseenter', function () {
-      glowEl.classList.add('is-visible');
-    });
-
-    // Delegated hover detection for interactive elements
-    var interactiveSelector = 'a, button, .btn, .btn-p, .card, .service-card, .project-card, .partner-logo-card, .ecosystem-cat-card, input, select, textarea, label, summary, [role="button"], [tabindex]:not([tabindex="-1"])';
-
-    document.addEventListener('pointerover', function (e) {
-      if (!e.target || e.target === document) return;
-      var target = e.target;
-      var interactiveEl = target.closest ? target.closest(interactiveSelector) : null;
-
-      if (interactiveEl || (window.getComputedStyle && window.getComputedStyle(target).cursor === 'pointer')) {
-        isHovering = true;
-        glowEl.classList.add('is-hovering');
-      }
-    }, { passive: true });
-
-    document.addEventListener('pointerout', function (e) {
-      if (!e.target || e.target === document) return;
-      var target = e.target;
-      var related = e.relatedTarget;
-
-      var interactiveEl = target.closest ? target.closest(interactiveSelector) : null;
-      if (interactiveEl) {
-        var relatedInteractive = related && related.closest ? related.closest(interactiveSelector) : null;
-        if (!relatedInteractive) {
-          isHovering = false;
-          glowEl.classList.remove('is-hovering');
-        }
-      }
-    }, { passive: true });
-
-    // Tiny momentary brightness bump on click (no ripple, no expanding circle)
-    window.addEventListener('mousedown', function (e) {
-      if (e.button !== 0) return;
-      if (window.innerWidth <= 1024) return;
-      if (!glowEl.classList.contains('is-visible')) return;
-
-      glowEl.classList.add('is-clicking');
-
-      if (clickTimeout) clearTimeout(clickTimeout);
-      clickTimeout = setTimeout(function () {
-        glowEl.classList.remove('is-clicking');
-      }, 150);
-    }, { passive: true });
-
-    window.addEventListener('resize', function () {
-      if (window.innerWidth <= 1024) {
-        glowEl.classList.remove('is-visible');
-      }
-    }, { passive: true });
-  }
-
-  // Initialize Ambient Cursor Luminance
+  // Initialize Engines on DOM Ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAmbientCursor);
+    document.addEventListener('DOMContentLoaded', function () {
+      initAmbientBackgroundLight();
+      initHeroSmartCard();
+    });
   } else {
-    initAmbientCursor();
+    initAmbientBackgroundLight();
+    initHeroSmartCard();
   }
 
 })();
-
-
-

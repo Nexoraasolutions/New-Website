@@ -60,6 +60,36 @@
   opacity: 0.85;
 }
 
+/* Global Ambient Pointer Light Layer (700-1200px subtle cyan/blue-grey background luminance) */
+.site-background::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    950px 950px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(0, 224, 255, 0.055) 0%,
+    rgba(0, 136, 154, 0.025) 45%,
+    transparent 75%
+  );
+  transition: opacity 0.4s ease;
+  opacity: 1;
+}
+
+@media (max-width: 1024px), (pointer: coarse), (hover: none) {
+  .site-background::after {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-background::after {
+    display: none !important;
+  }
+}
+
+
 #ambient-canvas {
   position: absolute;
   inset: 0;
@@ -1806,77 +1836,8 @@ footer {
 }
 
 
-/* ============================================================
-   NEXORAA — Ambient Cursor Luminance System
-   ============================================================ */
 
-.cursor-ambient-glow {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 160px;
-  height: 160px;
-  margin-top: -80px;
-  margin-left: -80px;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99999;
-  opacity: 0;
-  background: radial-gradient(
-    circle,
-    rgba(0, 224, 255, 0.055) 0%,
-    rgba(0, 224, 255, 0.02) 45%,
-    rgba(0, 224, 255, 0) 75%
-  );
-  filter: blur(28px);
-  transform: translate3d(0, 0, 0);
-  transition: opacity 0.35s ease, width 0.35s ease, height 0.35s ease, margin 0.35s ease, background 0.35s ease, filter 0.35s ease;
-  will-change: transform, opacity;
-}
 
-/* Visible state */
-.cursor-ambient-glow.is-visible {
-  opacity: 1;
-}
-
-/* Hover state - subtle increase in ambient pool (approx 200px diameter, 7.5% center opacity) */
-.cursor-ambient-glow.is-hovering {
-  width: 200px;
-  height: 200px;
-  margin-top: -100px;
-  margin-left: -100px;
-  background: radial-gradient(
-    circle,
-    rgba(0, 224, 255, 0.075) 0%,
-    rgba(0, 224, 255, 0.025) 50%,
-    rgba(0, 224, 255, 0) 80%
-  );
-  filter: blur(32px);
-}
-
-/* Momentary click brightness bump */
-.cursor-ambient-glow.is-clicking {
-  background: radial-gradient(
-    circle,
-    rgba(0, 224, 255, 0.12) 0%,
-    rgba(0, 224, 255, 0.04) 50%,
-    rgba(0, 224, 255, 0) 80%
-  );
-  filter: blur(24px);
-}
-
-/* Mobile, tablet, touch & reduced-motion disables */
-@media (max-width: 1024px), (pointer: coarse), (hover: none) {
-  .cursor-ambient-glow {
-    display: none !important;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cursor-ambient-glow {
-    display: none !important;
-  }
-}
 
 
 
