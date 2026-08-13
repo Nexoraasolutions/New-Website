@@ -330,4 +330,138 @@
     yrSpan.textContent = new Date().getFullYear();
   }
 
+  /* ---------- Premium Luminous Cursor Effect ---------- */
+  function initLuminousCursor() {
+    // Desktop and non-touch fine pointer check
+    if (window.innerWidth <= 1024) return;
+    if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;
+    if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if ('ontouchstart' in window && !window.matchMedia('(pointer: fine)').matches) return;
+
+    // Create glow element
+    var glowEl = document.createElement('div');
+    glowEl.className = 'cursor-glow';
+    document.body.appendChild(glowEl);
+
+    // Positions for smooth trailing lerp
+    var targetX = -100;
+    var targetY = -100;
+    var currentX = -100;
+    var currentY = -100;
+    var isInitialized = false;
+    var isHovering = false;
+
+    // Smooth movement interpolation loop
+    function updateCursorPosition() {
+      if (!isInitialized) return;
+
+      // Movement smoothing lerp (0.18 factor for elegant slight trailing lag)
+      currentX += (targetX - currentX) * 0.18;
+      currentY += (targetY - currentY) * 0.18;
+
+      if (Math.abs(targetX - currentX) < 0.01) currentX = targetX;
+      if (Math.abs(targetY - currentY) < 0.01) currentY = targetY;
+
+      var scaleVal = isHovering ? ' scale(1.85)' : ' scale(1)';
+      glowEl.style.transform = 'translate3d(' + currentX.toFixed(2) + 'px, ' + currentY.toFixed(2) + 'px, 0)' + scaleVal;
+
+      requestAnimationFrame(updateCursorPosition);
+    }
+
+    // Pointer move listener
+    window.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch') {
+        glowEl.classList.remove('is-visible');
+        return;
+      }
+
+      targetX = e.clientX;
+      targetY = e.clientY;
+
+      if (!isInitialized) {
+        currentX = targetX;
+        currentY = targetY;
+        isInitialized = true;
+        glowEl.classList.add('is-visible');
+        requestAnimationFrame(updateCursorPosition);
+      } else {
+        glowEl.classList.add('is-visible');
+      }
+    }, { passive: true });
+
+    // Handle mouse leaving/entering document window
+    document.addEventListener('mouseleave', function () {
+      glowEl.classList.remove('is-visible');
+    });
+
+    document.addEventListener('mouseenter', function () {
+      glowEl.classList.add('is-visible');
+    });
+
+    // Delegated hover detection for interactive elements
+    var interactiveSelector = 'a, button, .btn, .btn-p, .card, .service-card, .project-card, .partner-logo-card, .ecosystem-cat-card, input, select, textarea, label, summary, [role="button"], [tabindex]:not([tabindex="-1"])';
+
+    document.addEventListener('pointerover', function (e) {
+      if (!e.target || e.target === document) return;
+
+      var target = e.target;
+      var interactiveEl = target.closest ? target.closest(interactiveSelector) : null;
+
+      if (interactiveEl || (window.getComputedStyle && window.getComputedStyle(target).cursor === 'pointer')) {
+        isHovering = true;
+        glowEl.classList.add('is-hovering');
+      }
+    }, { passive: true });
+
+    document.addEventListener('pointerout', function (e) {
+      if (!e.target || e.target === document) return;
+
+      var target = e.target;
+      var related = e.relatedTarget;
+
+      var interactiveEl = target.closest ? target.closest(interactiveSelector) : null;
+      if (interactiveEl) {
+        var relatedInteractive = related && related.closest ? related.closest(interactiveSelector) : null;
+        if (!relatedInteractive) {
+          isHovering = false;
+          glowEl.classList.remove('is-hovering');
+        }
+      }
+    }, { passive: true });
+
+    // Quick subtle pulse/ripple on click
+    window.addEventListener('mousedown', function (e) {
+      if (e.button !== 0) return; // Left click only
+      if (window.innerWidth <= 1024) return;
+      if (!glowEl.classList.contains('is-visible')) return;
+
+      var rippleEl = document.createElement('div');
+      rippleEl.className = 'cursor-ripple';
+      rippleEl.style.transform = 'translate3d(' + e.clientX + 'px, ' + e.clientY + 'px, 0)';
+      document.body.appendChild(rippleEl);
+
+      setTimeout(function () {
+        if (rippleEl && rippleEl.parentNode) {
+          rippleEl.parentNode.removeChild(rippleEl);
+        }
+      }, 400);
+    }, { passive: true });
+
+    // Handle viewport resize
+    window.addEventListener('resize', function () {
+      if (window.innerWidth <= 1024) {
+        glowEl.classList.remove('is-visible');
+      }
+    }, { passive: true });
+  }
+
+  // Initialize cursor
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLuminousCursor);
+  } else {
+    initLuminousCursor();
+  }
+
 })();
+
