@@ -330,73 +330,125 @@
     yrSpan.textContent = new Date().getFullYear();
   }
 
-  /* ---------- Premium Luminous Cursor Effect ---------- */
-  function initLuminousCursor() {
-    // Desktop and non-touch fine pointer check
+  /* ---------- Architectural CAD Guide Line Cursor System ---------- */
+  function initCadCursor() {
+    // Mobile, touch, and reduced-motion checks
     if (window.innerWidth <= 1024) return;
     if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;
     if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if ('ontouchstart' in window && !window.matchMedia('(pointer: fine)').matches) return;
 
-    // Create glow element
-    var glowEl = document.createElement('div');
-    glowEl.className = 'cursor-glow';
-    document.body.appendChild(glowEl);
+    // Create CAD container and SVG
+    var container = document.createElement('div');
+    container.className = 'cursor-cad-container';
 
-    // Positions for smooth trailing lerp
-    var targetX = -100;
-    var targetY = -100;
-    var currentX = -100;
-    var currentY = -100;
+    container.innerHTML = '<svg id="cad-svg">' +
+      '<line id="cad-line" x1="0" y1="0" x2="0" y2="0" />' +
+      '<rect id="cad-origin-node" x="0" y="0" width="3" height="3" />' +
+      '<rect id="cad-node" x="0" y="0" width="7" height="7" />' +
+      '</svg>';
+
+    document.body.appendChild(container);
+
+    var cadLine = document.getElementById('cad-line');
+    var cadNode = document.getElementById('cad-node');
+    var originNode = document.getElementById('cad-origin-node');
+
+    if (!cadLine || !cadNode) return;
+
+    // Mouse coordinates and movement state
+    var cursorX = -100;
+    var cursorY = -100;
+    var prevCursorX = -100;
+    var prevCursorY = -100;
+
+    // Line endpoint position (smooth lerped)
+    var endX = -100;
+    var endY = -100;
+
+    // Target endpoint relative offset
+    var targetOffsetX = 100;
+    var targetOffsetY = 0;
+
     var isInitialized = false;
     var isHovering = false;
+    var defaultDistance = 110; // Guide line length (80px - 180px requirement)
 
-    // Smooth movement interpolation loop
-    function updateCursorPosition() {
+    function updateCadCursor() {
       if (!isInitialized) return;
 
-      // Movement smoothing lerp (0.18 factor for elegant slight trailing lag)
-      currentX += (targetX - currentX) * 0.18;
-      currentY += (targetY - currentY) * 0.18;
+      // Calculate movement delta to adjust primary axis alignment
+      var dx = cursorX - prevCursorX;
+      var dy = cursorY - prevCursorY;
 
-      if (Math.abs(targetX - currentX) < 0.01) currentX = targetX;
-      if (Math.abs(targetY - currentY) < 0.01) currentY = targetY;
+      // Update preferred axis based on dominant velocity if moving significantly
+      if (Math.abs(dx) > Math.abs(dy) + 2) {
+        targetOffsetX = (dx >= 0 ? 1 : -1) * defaultDistance;
+        targetOffsetY = 0;
+      } else if (Math.abs(dy) > Math.abs(dx) + 2) {
+        targetOffsetX = 0;
+        targetOffsetY = (dy >= 0 ? 1 : -1) * defaultDistance;
+      }
 
-      var scaleVal = isHovering ? ' scale(1.85)' : ' scale(1)';
-      glowEl.style.transform = 'translate3d(' + currentX.toFixed(2) + 'px, ' + currentY.toFixed(2) + 'px, 0)' + scaleVal;
+      prevCursorX = cursorX;
+      prevCursorY = cursorY;
 
-      requestAnimationFrame(updateCursorPosition);
+      var targetEndX = cursorX + targetOffsetX;
+      var targetEndY = cursorY + targetOffsetY;
+
+      // Smooth movement interpolation (lerp factor 0.16)
+      endX += (targetEndX - endX) * 0.16;
+      endY += (targetEndY - endY) * 0.16;
+
+      // Render crisp line from cursor to end point
+      cadLine.setAttribute('x1', cursorX.toFixed(1));
+      cadLine.setAttribute('y1', cursorY.toFixed(1));
+      cadLine.setAttribute('x2', endX.toFixed(1));
+      cadLine.setAttribute('y2', endY.toFixed(1));
+
+      // Render origin dot at cursor location
+      if (originNode) {
+        originNode.setAttribute('x', (cursorX - 1.5).toFixed(1));
+        originNode.setAttribute('y', (cursorY - 1.5).toFixed(1));
+      }
+
+      // Render 7px square node centered at endpoint
+      cadNode.setAttribute('x', (endX - 3.5).toFixed(1));
+      cadNode.setAttribute('y', (endY - 3.5).toFixed(1));
+
+      requestAnimationFrame(updateCadCursor);
     }
 
-    // Pointer move listener
+    // Mouse/pointer listener
     window.addEventListener('pointermove', function (e) {
       if (e.pointerType === 'touch') {
-        glowEl.classList.remove('is-visible');
+        container.classList.remove('is-visible');
         return;
       }
 
-      targetX = e.clientX;
-      targetY = e.clientY;
+      cursorX = e.clientX;
+      cursorY = e.clientY;
 
       if (!isInitialized) {
-        currentX = targetX;
-        currentY = targetY;
+        prevCursorX = cursorX;
+        prevCursorY = cursorY;
+        endX = cursorX + targetOffsetX;
+        endY = cursorY + targetOffsetY;
         isInitialized = true;
-        glowEl.classList.add('is-visible');
-        requestAnimationFrame(updateCursorPosition);
+        container.classList.add('is-visible');
+        requestAnimationFrame(updateCadCursor);
       } else {
-        glowEl.classList.add('is-visible');
+        container.classList.add('is-visible');
       }
     }, { passive: true });
 
-    // Handle mouse leaving/entering document window
     document.addEventListener('mouseleave', function () {
-      glowEl.classList.remove('is-visible');
+      container.classList.remove('is-visible');
     });
 
     document.addEventListener('mouseenter', function () {
-      glowEl.classList.add('is-visible');
+      container.classList.add('is-visible');
     });
 
     // Delegated hover detection for interactive elements
@@ -404,19 +456,17 @@
 
     document.addEventListener('pointerover', function (e) {
       if (!e.target || e.target === document) return;
-
       var target = e.target;
       var interactiveEl = target.closest ? target.closest(interactiveSelector) : null;
 
       if (interactiveEl || (window.getComputedStyle && window.getComputedStyle(target).cursor === 'pointer')) {
         isHovering = true;
-        glowEl.classList.add('is-hovering');
+        container.classList.add('is-hovering');
       }
     }, { passive: true });
 
     document.addEventListener('pointerout', function (e) {
       if (!e.target || e.target === document) return;
-
       var target = e.target;
       var related = e.relatedTarget;
 
@@ -425,43 +475,43 @@
         var relatedInteractive = related && related.closest ? related.closest(interactiveSelector) : null;
         if (!relatedInteractive) {
           isHovering = false;
-          glowEl.classList.remove('is-hovering');
+          container.classList.remove('is-hovering');
         }
       }
     }, { passive: true });
 
-    // Quick subtle pulse/ripple on click
+    // Subtle square pulse on click at endpoint and cursor
     window.addEventListener('mousedown', function (e) {
-      if (e.button !== 0) return; // Left click only
+      if (e.button !== 0) return;
       if (window.innerWidth <= 1024) return;
-      if (!glowEl.classList.contains('is-visible')) return;
+      if (!container.classList.contains('is-visible')) return;
 
-      var rippleEl = document.createElement('div');
-      rippleEl.className = 'cursor-ripple';
-      rippleEl.style.transform = 'translate3d(' + e.clientX + 'px, ' + e.clientY + 'px, 0)';
-      document.body.appendChild(rippleEl);
+      var pulseEl = document.createElement('div');
+      pulseEl.className = 'cad-square-pulse';
+      pulseEl.style.transform = 'translate3d(' + endX.toFixed(1) + 'px, ' + endY.toFixed(1) + 'px, 0)';
+      document.body.appendChild(pulseEl);
 
       setTimeout(function () {
-        if (rippleEl && rippleEl.parentNode) {
-          rippleEl.parentNode.removeChild(rippleEl);
+        if (pulseEl && pulseEl.parentNode) {
+          pulseEl.parentNode.removeChild(pulseEl);
         }
-      }, 400);
+      }, 300);
     }, { passive: true });
 
-    // Handle viewport resize
     window.addEventListener('resize', function () {
       if (window.innerWidth <= 1024) {
-        glowEl.classList.remove('is-visible');
+        container.classList.remove('is-visible');
       }
     }, { passive: true });
   }
 
-  // Initialize cursor
+  // Initialize CAD cursor
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initLuminousCursor);
+    document.addEventListener('DOMContentLoaded', initCadCursor);
   } else {
-    initLuminousCursor();
+    initCadCursor();
   }
 
 })();
+
 
