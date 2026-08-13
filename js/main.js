@@ -115,9 +115,9 @@
   var TGT = Object.assign({}, CUR);
 
   var SCENES = {
-    wake: { label: 'Wake', k: 3000, lvl: .30, cove: .35, down: .10, lamp: .15, path: .20, screen: 0, shades: .15, day: .30, hour: 6.5 },
+    wake: { label: 'Wake', k: 3000, lvl: .50, cove: .25, down: .10, lamp: .10, path: .10, screen: 0, shades: .20, day: .75, hour: 7.0 },
     day: { label: 'Day', k: 6000, lvl: .88, cove: .08, down: .12, lamp: 0, path: 0, screen: 0, shades: 0, day: 1, hour: 12 },
-    work: { label: 'Work', k: 4300, lvl: .78, cove: .45, down: .88, lamp: .30, path: 0, screen: .22, shades: .55, day: .70, hour: 15 },
+    work: { label: 'Work', k: 4300, lvl: .78, cove: .45, down: .88, lamp: .30, path: 0, screen: 0, shades: .55, day: .70, hour: 15 },
     evening: { label: 'Evening', k: 2700, lvl: .45, cove: .55, down: .25, lamp: .75, path: .10, screen: 0, shades: 1, day: .04, hour: 19.5 },
     cinema: { label: 'Cinema', k: 2400, lvl: .13, cove: .06, down: 0, lamp: .04, path: .14, screen: 1, shades: 1, day: 0, hour: 21 },
     night: { label: 'Night', k: 2400, lvl: .07, cove: 0, down: 0, lamp: 0, path: .18, screen: 0, shades: 1, day: 0, hour: 23.5 },
@@ -281,6 +281,16 @@
       fill: 'url(#gScrGlow)', filter: 'url(#softer)'
     });
     R.scrPool = add('ellipse', { cx: (SCREEN.x0 + SCREEN.x1) / 2, cy: 470, rx: 330, ry: 46, fill: 'url(#gScrPool)', filter: 'url(#soft)' });
+    R.scrBezel = add('rect', {
+      x: SCREEN.x0 - 3,
+      y: SCREEN.y0 - 3,
+      width: (SCREEN.x1 - SCREEN.x0) + 6,
+      height: (SCREEN.y1 - SCREEN.y0) + 6,
+      rx: 2,
+      fill: 'none',
+      stroke: 'rgba(255, 255, 255, 0.15)',
+      'stroke-width': 1.5
+    });
     R.scrBody = add('rect', { x: SCREEN.x0, y: SCREEN.y0, width: SCREEN.x1 - SCREEN.x0, height: SCREEN.y1 - SCREEN.y0 });
     R.scrLit = add('rect', { x: SCREEN.x0, y: SCREEN.y0, width: SCREEN.x1 - SCREEN.x0, height: SCREEN.y1 - SCREEN.y0, fill: 'url(#gScreen)' });
     R.scrLogo = add('text', {
@@ -401,7 +411,8 @@
 
     var flick = REDUCED ? 1 : 1 + 0.16 * (Math.sin(ts * 0.00042) + 0.55 * Math.sin(ts * 0.00131));
     var sc = clamp(CUR.screen * flick, 0, 1.2);
-    R.scrBody.setAttribute('fill', rgb(mix(base, g, 0.05)));
+    if (R.scrBezel) R.scrBezel.setAttribute('stroke', rgb(mix(base, g, 0.16 + lvl * 0.28)));
+    R.scrBody.setAttribute('fill', rgb(mix(base, g, 0.05 + lvl * 0.08)));
     R.scrLit.setAttribute('opacity', (sc * 0.92).toFixed(3));
     R.scrGlow.setAttribute('opacity', (sc * 0.85).toFixed(3));
     R.scrPool.setAttribute('opacity', (sc * 0.7).toFixed(3));
@@ -413,19 +424,21 @@
     var full = [rightPt(WIN.t0, WIN.h0), rightPt(WIN.t1, WIN.h0), C, D];
     R.winFrame.setAttribute('points', pts(full));
     R.winFrame.setAttribute('stroke', rgb(mix(base, g, 0.30 + lvl * 0.4)));
+
+    var openAmt = (1 - CUR.shades);
+    var dayContrib = CUR.day * (0.15 + openAmt * 0.85);
     R.winSky.setAttribute('points', pts([A, B, C, D]));
-    R.winSky.setAttribute('opacity', (0.10 + CUR.day * 0.9).toFixed(3));
+    R.winSky.setAttribute('opacity', (0.05 + dayContrib * 0.95).toFixed(3));
     R.shade.setAttribute('points', pts([full[0], full[1], B, A]));
     R.shade.setAttribute('fill', rgb(mix(base, g, 0.24 + lvl * 0.28)));
 
     var elev = clamp(0.5 - dir.y * 0.5, 0, 1);
     var L = [-(95 + (1 - elev) * 350), 150 - (1 - elev) * 108 + dir.x * 26];
     var off = function (p) { return [p[0] + L[0], p[1] + L[1]]; };
-    var strength = CUR.day * (1 - CUR.shades * 0.9);
     R.shaft.setAttribute('points', pts([A, B, off(B), off(C), off(D), off(A)]));
-    R.shaft.setAttribute('opacity', (strength * 0.55).toFixed(3));
+    R.shaft.setAttribute('opacity', (dayContrib * 0.60).toFixed(3));
     R.patch.setAttribute('points', pts([off(A), off(B), off(C), off(D)]));
-    R.patch.setAttribute('opacity', (strength * 0.85).toFixed(3));
+    R.patch.setAttribute('opacity', (dayContrib * 0.90).toFixed(3));
 
     R.rug.setAttribute('fill', rgb(mix(base, g, 0.14 + lvl * 0.30)));
     for (var j = 0; j < R.furn.length; j++) {
