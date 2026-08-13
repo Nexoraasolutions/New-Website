@@ -86,125 +86,45 @@
       </div>
     </div>
 
-    <!-- RIGHT COLUMN: SMART HOME DASHBOARD CARD (CLEAN SINGLE CONTAINER, NO UNWANTED STRIPS) -->
+    <!-- RIGHT COLUMN: REFERENCE LIVE ROOM CONTROL INTERFACE -->
     <div class="hero-stage reveal-up">
-      <div class="smart-dashboard">
-        <!-- Top Bar -->
-        <div class="dash-hdr">
-          <div class="dash-room-selector">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
-            <span class="room-label">Living Room</span>
-          </div>
-          <div class="dash-badges">
-            <span class="dash-pill"><span class="pulse-dot"></span> Online</span>
-            <span class="dash-pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg> Wi-Fi 7</span>
-          </div>
+      <div class="room">
+        <div class="room__brackets" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+        <div class="room__plate">
+          <span class="hud">Living / ground floor &mdash; section A&ndash;A</span>
+          <span class="hud">Scene <b id="hudScene">Evening</b> &middot; <b id="hudTime">19:30</b></span>
         </div>
 
-        <!-- Scenes Bar -->
-        <div class="dash-scenes">
-          <button class="scene-btn" data-scene="morning">Morning</button>
-          <button class="scene-btn active" data-scene="night">Night</button>
-          <button class="scene-btn" data-scene="cinema">Cinema</button>
-          <button class="scene-btn" data-scene="away">Away</button>
-        </div>
+        <svg class="room__view" id="room" viewBox="0 0 900 560" role="img"
+             aria-label="A live cutaway render of a living room. Every luminaire, the motorised shades and the daylight through the window are lit from the scene currently selected."></svg>
 
-        <!-- Controls Grid -->
-        <div class="dash-grid">
-          <!-- Lighting & Color Temp -->
-          <div class="dash-item">
-            <div class="dash-item-head">
-              <div class="dash-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg></div>
-              <div>
-                <div class="dash-item-title">Ambient Lighting</div>
-                <div class="dash-item-sub" id="light-sub">Main Cove • 2700K</div>
-              </div>
-              <div class="dash-item-val" id="light-val">80%</div>
-            </div>
-            <input type="range" id="light-slider" class="dash-slider" min="0" max="100" value="80" />
-            <div class="temp-preset-row">
-              <button class="k-btn active" data-k="2700K">2700K</button>
-              <button class="k-btn" data-k="3000K">3000K</button>
-              <button class="k-btn" data-k="4000K">4000K</button>
-              <button class="k-btn" data-k="6500K">6500K</button>
-            </div>
-          </div>
-
-          <!-- Motorized Blinds -->
-          <div class="dash-item">
-            <div class="dash-item-head">
-              <div class="dash-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18"/></svg></div>
-              <div>
-                <div class="dash-item-title">Motorized Blinds</div>
-                <div class="dash-item-sub" id="blind-sub">Sheer Solar Shades</div>
-              </div>
-              <div class="dash-item-val" id="blind-val">40%</div>
-            </div>
-            <input type="range" id="blind-slider" class="dash-slider" min="0" max="100" value="40" />
-          </div>
-
-          <!-- Climate -->
-          <div class="dash-item">
-            <div class="dash-item-head">
-              <div class="dash-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z"/></svg></div>
-              <div>
-                <div class="dash-item-title">Climate Control</div>
-                <div class="dash-item-sub">Auto Cooling</div>
-              </div>
-              <div class="dash-temp-ctrl">
-                <button class="temp-btn" id="temp-minus">-</button>
-                <span class="dash-item-val" id="temp-val">22°C</span>
-                <button class="temp-btn" id="temp-plus">+</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Lock Status -->
-          <div class="dash-item">
-            <div class="dash-item-head">
-              <div class="dash-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
-              <div>
-                <div class="dash-item-title">Front Lock</div>
-                <div class="dash-item-sub">Biometric Pass</div>
-              </div>
-              <button class="dash-lock-btn locked" id="lock-btn">
-                <span class="dash-lock-status">Locked</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Security Status -->
-          <div class="dash-item">
-            <div class="dash-item-head">
-              <div class="dash-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-              <div>
-                <div class="dash-item-title">Perimeter AI</div>
-                <div class="dash-item-sub">Surveillance</div>
-              </div>
-              <button class="dash-sec-btn active" id="sec-btn">
-                <span class="dash-sec-status">Active</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- B&O Audio Widget -->
-          <div class="dash-item">
-            <div class="dash-item-head">
-              <div class="dash-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13M9 9l12-2"/></svg></div>
-              <div style="flex:1;">
-                <div class="dash-item-title">B&amp;O Spatial Audio</div>
-                <div class="dash-item-sub" id="audio-sub">Lounge Mix</div>
-              </div>
-              <button class="dash-play-btn" id="play-btn" aria-label="Play/Pause Audio">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              </button>
-            </div>
-          </div>
+        <div class="read" id="readout">
+          <div><span class="stat__l">Colour temp</span><b class="read__k" id="rK">2700 K</b><span class="bar"><i id="bK"></i></span></div>
+          <div><span class="stat__l">Cove</span><b class="read__k" id="rCove">55%</b><span class="bar"><i id="bCove"></i></span></div>
+          <div><span class="stat__l">Downlights</span><b class="read__k" id="rDown">25%</b><span class="bar"><i id="bDown"></i></span></div>
+          <div><span class="stat__l">Floor lamp</span><b class="read__k" id="rLamp">75%</b><span class="bar"><i id="bLamp"></i></span></div>
+          <div><span class="stat__l">Path</span><b class="read__k" id="rPath">10%</b><span class="bar"><i id="bPath"></i></span></div>
+          <div><span class="stat__l">Shades</span><b class="read__k" id="rShade">Closed</b><span class="bar"><i id="bShade"></i></span></div>
         </div>
       </div>
+
+      <!-- Self-Contained Keypad Inside Hero Card Area -->
+      <form class="card-kp" id="keypad">
+        <div class="scene-stops">
+          <label class="scene-stop"><input type="radio" name="scene" value="wake"><b></b><em>Wake</em><i>2400 K</i></label>
+          <label class="scene-stop"><input type="radio" name="scene" value="day"><b></b><em>Day</em><i>5000 K</i></label>
+          <label class="scene-stop"><input type="radio" name="scene" value="work"><b></b><em>Work</em><i>4300 K</i></label>
+          <label class="scene-stop active"><input type="radio" name="scene" value="evening" checked><b></b><em>Evening</em><i>2700 K</i></label>
+          <label class="scene-stop"><input type="radio" name="scene" value="cinema"><b></b><em>Cinema</em><i>2000 K</i></label>
+          <label class="scene-stop"><input type="radio" name="scene" value="night"><b></b><em>Night</em><i>1800 K</i></label>
+          <label class="scene-stop"><input type="radio" name="scene" value="away"><b></b><em>Away</em><i>Sim</i></label>
+        </div>
+      </form>
     </div>
   </div>
 </section>
+
 
 <!-- ================= CATEGORIZED TRUSTED PARTNERS SECTION ================= -->
 <section class="partners-sec">
