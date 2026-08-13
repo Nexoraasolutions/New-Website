@@ -79,7 +79,7 @@
 
   /* --- A. Kelvin → Colour --------------------------------------------------- */
   function kelvin(k) {
-    var t = clamp(k, 1000, 12000) / 100;
+    var t = clamp(k, 2400, 6000) / 100;
     var r, g, b;
     if (t <= 66) { r = 255; g = 99.4708025861 * Math.log(t) - 161.1195681661; }
     else { r = 329.698727446 * Math.pow(t - 60, -0.1332047592); g = 288.1221695283 * Math.pow(t - 60, -0.0755148492); }
@@ -115,12 +115,12 @@
   var TGT = Object.assign({}, CUR);
 
   var SCENES = {
-    wake: { label: 'Wake', k: 2400, lvl: .30, cove: .35, down: .10, lamp: .15, path: .20, screen: 0, shades: .15, day: .30, hour: 6.5 },
-    day: { label: 'Day', k: 5000, lvl: .88, cove: .08, down: .12, lamp: 0, path: 0, screen: 0, shades: 0, day: 1, hour: 12 },
+    wake: { label: 'Wake', k: 3000, lvl: .30, cove: .35, down: .10, lamp: .15, path: .20, screen: 0, shades: .15, day: .30, hour: 6.5 },
+    day: { label: 'Day', k: 6000, lvl: .88, cove: .08, down: .12, lamp: 0, path: 0, screen: 0, shades: 0, day: 1, hour: 12 },
     work: { label: 'Work', k: 4300, lvl: .78, cove: .45, down: .88, lamp: .30, path: 0, screen: .22, shades: .55, day: .70, hour: 15 },
     evening: { label: 'Evening', k: 2700, lvl: .45, cove: .55, down: .25, lamp: .75, path: .10, screen: 0, shades: 1, day: .04, hour: 19.5 },
-    cinema: { label: 'Cinema', k: 2000, lvl: .13, cove: .06, down: 0, lamp: .04, path: .14, screen: 1, shades: 1, day: 0, hour: 21 },
-    night: { label: 'Night', k: 1800, lvl: .07, cove: 0, down: 0, lamp: 0, path: .18, screen: 0, shades: 1, day: 0, hour: 23.5 },
+    cinema: { label: 'Cinema', k: 2400, lvl: .13, cove: .06, down: 0, lamp: .04, path: .14, screen: 1, shades: 1, day: 0, hour: 21 },
+    night: { label: 'Night', k: 2400, lvl: .07, cove: 0, down: 0, lamp: 0, path: .18, screen: 0, shades: 1, day: 0, hour: 23.5 },
     away: { label: 'Away', k: 4000, lvl: .22, cove: .12, down: .08, lamp: .24, path: 0, screen: 0, shades: .5, day: .12, hour: 20.5 }
   };
 
@@ -283,6 +283,18 @@
     R.scrPool = add('ellipse', { cx: (SCREEN.x0 + SCREEN.x1) / 2, cy: 470, rx: 330, ry: 46, fill: 'url(#gScrPool)', filter: 'url(#soft)' });
     R.scrBody = add('rect', { x: SCREEN.x0, y: SCREEN.y0, width: SCREEN.x1 - SCREEN.x0, height: SCREEN.y1 - SCREEN.y0 });
     R.scrLit = add('rect', { x: SCREEN.x0, y: SCREEN.y0, width: SCREEN.x1 - SCREEN.x0, height: SCREEN.y1 - SCREEN.y0, fill: 'url(#gScreen)' });
+    R.scrLogo = add('text', {
+      x: (SCREEN.x0 + SCREEN.x1) / 2,
+      y: (SCREEN.y0 + SCREEN.y1) / 2 + 5,
+      'text-anchor': 'middle',
+      fill: 'var(--cyan)',
+      'font-family': 'var(--display)',
+      'font-size': '15px',
+      'font-weight': '400',
+      'letter-spacing': '5px',
+      filter: 'drop-shadow(0 0 6px var(--cyan-glow))'
+    });
+    R.scrLogo.textContent = 'NEXORAA';
 
     var junction = pts([floorPt(0, 0), floorPt(0, 1), floorPt(1, 1), floorPt(1, 0)]);
     R.pathWash = add('polyline', { points: junction, fill: 'none', stroke: 'var(--glow)', 'stroke-width': 16, filter: 'url(#soft)' });
@@ -389,10 +401,11 @@
 
     var flick = REDUCED ? 1 : 1 + 0.16 * (Math.sin(ts * 0.00042) + 0.55 * Math.sin(ts * 0.00131));
     var sc = clamp(CUR.screen * flick, 0, 1.2);
-    R.scrBody.setAttribute('fill', rgb(mix(base, g, 0.10)));
+    R.scrBody.setAttribute('fill', rgb(mix(base, g, 0.05)));
     R.scrLit.setAttribute('opacity', (sc * 0.92).toFixed(3));
     R.scrGlow.setAttribute('opacity', (sc * 0.85).toFixed(3));
     R.scrPool.setAttribute('opacity', (sc * 0.7).toFixed(3));
+    if (R.scrLogo) R.scrLogo.setAttribute('opacity', (sc * 0.95).toFixed(3));
 
     var hTop = WIN.h0 + CUR.shades * (WIN.h1 - WIN.h0);
     var A = rightPt(WIN.t0, hTop), B = rightPt(WIN.t1, hTop),
@@ -447,10 +460,11 @@
 
     var k = Math.round(CUR.k / 10) * 10;
     if (rK) rK.textContent = k + ' K';
-    if (bK) bK.style.width = clamp((CUR.k - 1700) / 3600, 0, 1) * 100 + '%';
+    if (bK) bK.style.width = clamp((CUR.k - 2400) / 3600, 0, 1) * 100 + '%';
 
     if (rCove) rCove.textContent = pct(CUR.cove);
     if (bCove) bCove.style.width = CUR.cove * 100 + '%';
+
 
     if (rDown) rDown.textContent = pct(CUR.down);
     if (bDown) bDown.style.width = CUR.down * 100 + '%';
