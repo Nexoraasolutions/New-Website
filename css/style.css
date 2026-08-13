@@ -47,17 +47,25 @@
   overflow: hidden;
 }
 
-/* One Global Architectural Grid (64px Spacing, 2.2% Opacity) */
+#ambient-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* One Global Architectural Grid (64px Spacing, Subtle 3.5% Opacity) */
 .site-background::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
   background-size: 64px 64px;
   pointer-events: none;
   opacity: 0.85;
+  z-index: 3;
 }
 
 /* Ground & Global Ambient Pointer Light Layer (Reference math, +10% luminance) */
@@ -77,6 +85,7 @@
   transition: opacity 0.4s ease;
   opacity: 1;
 }
+
 
 @media (max-width: 1024px), (pointer: coarse), (hover: none) {
   .ground,
