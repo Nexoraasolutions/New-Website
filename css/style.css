@@ -1807,113 +1807,77 @@ footer {
 
 
 /* ============================================================
-   NEXORAA — Architectural CAD Guide Line Cursor System
+   NEXORAA — Ambient Cursor Luminance System
    ============================================================ */
 
-.cursor-cad-container {
+.cursor-ambient-glow {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  margin-left: -22px;
+  border-radius: 50%;
   pointer-events: none;
   z-index: 99999;
   opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.cursor-cad-container.is-visible {
-  opacity: 1;
-}
-
-#cad-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-  pointer-events: none;
-}
-
-/* Thin cyan drafting line */
-#cad-line {
-  stroke: #00E0FF;
-  stroke-width: 1.25px;
-  stroke-linecap: square;
-  filter: drop-shadow(0 0 3px rgba(0, 224, 255, 0.6));
-  transition: stroke-width 0.25s ease, filter 0.25s ease, stroke 0.25s ease;
-}
-
-/* Small square anchor node at end of guide line */
-#cad-node {
-  fill: rgba(0, 224, 255, 0.85);
-  stroke: #00E0FF;
-  stroke-width: 1px;
-  filter: drop-shadow(0 0 4px rgba(0, 224, 255, 0.75));
-  transition: fill 0.25s ease, filter 0.25s ease, stroke-width 0.25s ease;
-}
-
-/* Cursor origin dot */
-#cad-origin-node {
-  fill: #00E0FF;
-  filter: drop-shadow(0 0 2px rgba(0, 224, 255, 0.8));
-}
-
-/* Hover state on interactive elements - intensify line and brighten endpoint square */
-.cursor-cad-container.is-hovering #cad-line {
-  stroke: #50F2FF;
-  stroke-width: 1.6px;
-  filter: drop-shadow(0 0 6px rgba(0, 224, 255, 0.95));
-}
-
-.cursor-cad-container.is-hovering #cad-node {
-  fill: #ffffff;
-  stroke: #00E0FF;
-  stroke-width: 1.5px;
-  filter: drop-shadow(0 0 7px #00E0FF);
-}
-
-/* Quick subtle square pulse on click */
-.cad-square-pulse {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 10px;
-  height: 10px;
-  margin-top: -5px;
-  margin-left: -5px;
-  pointer-events: none;
-  z-index: 99998;
-  border: 1.25px solid #00E0FF;
-  background: rgba(0, 224, 255, 0.15);
-  box-shadow: 0 0 8px rgba(0, 224, 255, 0.7);
-  animation: cadSquarePulseAnim 0.28s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+  background: radial-gradient(
+    circle,
+    rgba(0, 224, 255, 0.14) 0%,
+    rgba(0, 224, 255, 0.05) 45%,
+    rgba(0, 224, 255, 0) 70%
+  );
+  filter: blur(8px);
+  transform: translate3d(0, 0, 0);
+  transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease, margin 0.3s ease, background 0.3s ease, filter 0.3s ease;
   will-change: transform, opacity;
 }
 
-@keyframes cadSquarePulseAnim {
-  0% {
-    transform: translate3d(0, 0, 0) scale(0.8);
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(0, 0, 0) scale(2.4);
-    opacity: 0;
-  }
+/* Visible state */
+.cursor-ambient-glow.is-visible {
+  opacity: 1;
+}
+
+/* Hover state - very subtle boost on interactive elements (62px max diameter, 18% center opacity) */
+.cursor-ambient-glow.is-hovering {
+  width: 62px;
+  height: 62px;
+  margin-top: -31px;
+  margin-left: -31px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 224, 255, 0.18) 0%,
+    rgba(0, 224, 255, 0.07) 50%,
+    rgba(0, 224, 255, 0) 75%
+  );
+  filter: blur(10px);
+}
+
+/* Momentary click brightness bump (no ripple, no expanding ring) */
+.cursor-ambient-glow.is-clicking {
+  background: radial-gradient(
+    circle,
+    rgba(0, 224, 255, 0.28) 0%,
+    rgba(0, 224, 255, 0.1) 50%,
+    rgba(0, 224, 255, 0) 75%
+  );
+  filter: blur(7px);
 }
 
 /* Mobile, tablet, touch & reduced-motion disables */
 @media (max-width: 1024px), (pointer: coarse), (hover: none) {
-  .cursor-cad-container,
-  .cad-square-pulse {
+  .cursor-ambient-glow {
     display: none !important;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cursor-cad-container,
-  .cad-square-pulse {
+  .cursor-ambient-glow {
     display: none !important;
   }
 }
+
 
 
 
